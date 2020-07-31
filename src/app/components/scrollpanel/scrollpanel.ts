@@ -1,29 +1,33 @@
-import { NgModule, Component, Input, AfterViewInit, OnDestroy, ElementRef, NgZone, ViewChild } from '@angular/core';
+import { NgModule, Component, Input, AfterViewInit, OnDestroy, ElementRef, NgZone, ViewChild, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef, AfterContentInit, ContentChildren, QueryList, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DomHandler } from '../dom/domhandler';
+import { DomHandler } from 'primeng/dom';
+import { PrimeTemplate } from '../api/shared';
 
 @Component({
     selector: 'p-scrollPanel',
     template: `
-        <div #container [ngClass]="'ui-scrollpanel ui-widget ui-widget-content ui-corner-all'" [ngStyle]="style" [class]="styleClass">
-            <div class="ui-scrollpanel-wrapper">
-                <div #content class="ui-scrollpanel-content">
+        <div #container [ngClass]="'p-scrollpanel p-component'" [ngStyle]="style" [class]="styleClass">
+            <div class="p-scrollpanel-wrapper">
+                <div #content class="p-scrollpanel-content">
                     <ng-content></ng-content>
+                    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
-            <div #xBar class="ui-scrollpanel-bar ui-scrollpanel-bar-x"></div>
-            <div #yBar class="ui-scrollpanel-bar ui-scrollpanel-bar-y"></div>   
+            <div #xBar class="p-scrollpanel-bar p-scrollpanel-bar-x"></div>
+            <div #yBar class="p-scrollpanel-bar p-scrollpanel-bar-y"></div>   
         </div>
     `,
-    providers: [DomHandler]
+   changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./scrollpanel.css']
 })
-export class ScrollPanel implements AfterViewInit, OnDestroy {
+export class ScrollPanel implements AfterViewInit, AfterContentInit, OnDestroy {
 
     @Input() style: any;
 
     @Input() styleClass: string;
     
-    constructor(public el: ElementRef, public zone: NgZone, public domHandler: DomHandler) {}
+    constructor(public el: ElementRef, public zone: NgZone, public cd: ChangeDetectorRef) {}
 
     @ViewChild('container') containerViewChild: ElementRef;
 
@@ -32,6 +36,8 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
     @ViewChild('xBar') xBarViewChild: ElementRef;
     
     @ViewChild('yBar') yBarViewChild: ElementRef;
+
+    @ContentChildren(PrimeTemplate) templates: QueryList<any>;
 
     scrollYRatio: number;
 
@@ -49,6 +55,8 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
 
     isYBarClicked: boolean;
 
+    contentTemplate: TemplateRef<any>;
+
     ngAfterViewInit() {
         this.zone.runOutsideAngular(() => {
             this.moveBar();
@@ -63,8 +71,44 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
             this.contentViewChild.nativeElement.addEventListener('mouseenter', this.moveBar);
             this.xBarViewChild.nativeElement.addEventListener('mousedown', this.onXBarMouseDown);
             this.yBarViewChild.nativeElement.addEventListener('mousedown', this.onYBarMouseDown);
+
+            this.calculateContainerHeight();
+
             this.initialized = true;
         });
+    }
+
+    ngAfterContentInit() {
+        this.templates.forEach((item) => {
+            switch(item.getType()) {
+                case 'content':
+                    this.contentTemplate = item.template;
+                break;
+
+                default:
+                    this.contentTemplate = item.template;
+                break;
+            }
+        });
+    }
+
+    calculateContainerHeight() {
+        let container = this.containerViewChild.nativeElement;
+        let content = this.contentViewChild.nativeElement;
+        let xBar = this.xBarViewChild.nativeElement;
+
+        let containerStyles = getComputedStyle(container),
+        xBarStyles = getComputedStyle(xBar),
+        pureContainerHeight = DomHandler.getHeight(container) - parseInt(xBarStyles['height'], 10);
+
+        if (containerStyles['max-height'] != "none" && pureContainerHeight == 0) {
+            if (content.offsetHeight + parseInt(xBarStyles['height'], 10) > parseInt(containerStyles['max-height'], 10)) {
+                container.style.height = containerStyles['max-height'];
+            }
+            else {
+                container.style.height = content.offsetHeight + parseFloat(containerStyles.paddingTop) + parseFloat(containerStyles.paddingBottom) + parseFloat(containerStyles.borderTopWidth) + parseFloat(containerStyles.borderBottomWidth) + "px";
+            }
+        }
     }
 
     moveBar() {
@@ -89,19 +133,23 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
 
         this.requestAnimationFrame(() => {
             if (this.scrollXRatio >= 1) {
-                this.domHandler.addClass(xBar, 'ui-scrollpanel-hidden');
+                DomHandler.addClass(xBar, 'p-scrollpanel-hidden');
             } 
             else {
-                this.domHandler.removeClass(xBar, 'ui-scrollpanel-hidden');
-                xBar.style.cssText = 'width:' + Math.max(this.scrollXRatio * 100, 10) + '%; left:' + (content.scrollLeft / totalWidth) * 100 + '%;bottom:' + bottom + 'px;';
+                DomHandler.removeClass(xBar, 'p-scrollpanel-hidden');
+                const xBarWidth = Math.max(this.scrollXRatio * 100, 10);
+                const xBarLeft = content.scrollLeft * (100 - xBarWidth) / (totalWidth - ownWidth);
+                xBar.style.cssText = 'width:' + xBarWidth + '%; left:' + xBarLeft + '%;bottom:' + bottom + 'px;';
             }
 
             if (this.scrollYRatio >= 1) {
-                this.domHandler.addClass(yBar, 'ui-scrollpanel-hidden');
+                DomHandler.addClass(yBar, 'p-scrollpanel-hidden');
             } 
             else {
-                this.domHandler.removeClass(yBar, 'ui-scrollpanel-hidden');
-                yBar.style.cssText = 'height:' + Math.max(this.scrollYRatio * 100, 10) + '%; top: calc(' + (content.scrollTop / totalHeight) * 100 + '% - ' + xBar.clientHeight + 'px);right:' + right + 'px;';
+                DomHandler.removeClass(yBar, 'p-scrollpanel-hidden');
+                const yBarHeight = Math.max(this.scrollYRatio * 100, 10);
+                const yBarTop = content.scrollTop * (100 - yBarHeight) / (totalHeight - ownHeight);
+                yBar.style.cssText = 'height:' + yBarHeight + '%; top: calc(' + yBarTop + '% - ' + xBar.clientHeight + 'px);right:' + right + 'px;';
             }
         });
     }
@@ -109,9 +157,9 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
     onYBarMouseDown(e: MouseEvent) {
         this.isYBarClicked = true;
         this.lastPageY = e.pageY;
-        this.domHandler.addClass(this.yBarViewChild.nativeElement, 'ui-scrollpanel-grabbed');
+        DomHandler.addClass(this.yBarViewChild.nativeElement, 'p-scrollpanel-grabbed');
         
-        this.domHandler.addClass(document.body, 'ui-scrollpanel-grabbed');
+        DomHandler.addClass(document.body, 'p-scrollpanel-grabbed');
 
         document.addEventListener('mousemove', this.onDocumentMouseMove);
         document.addEventListener('mouseup', this.onDocumentMouseUp);
@@ -121,9 +169,9 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
     onXBarMouseDown(e: MouseEvent) {
         this.isXBarClicked = true;
         this.lastPageX = e.pageX;
-        this.domHandler.addClass(this.xBarViewChild.nativeElement, 'ui-scrollpanel-grabbed');
+        DomHandler.addClass(this.xBarViewChild.nativeElement, 'p-scrollpanel-grabbed');
 
-        this.domHandler.addClass(document.body, 'ui-scrollpanel-grabbed');
+        DomHandler.addClass(document.body, 'p-scrollpanel-grabbed');
 
         document.addEventListener('mousemove', this.onDocumentMouseMove);
         document.addEventListener('mouseup', this.onDocumentMouseUp);
@@ -131,10 +179,10 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
     }
 
     onDocumentMouseMove(e: MouseEvent) {
-        if(this.isXBarClicked) {
+        if (this.isXBarClicked) {
             this.onMouseMoveForXBar(e);
         }
-        else if(this.isYBarClicked) {
+        else if (this.isYBarClicked) {
             this.onMouseMoveForYBar(e);
         }
         else {
@@ -162,10 +210,16 @@ export class ScrollPanel implements AfterViewInit, OnDestroy {
         });
     }
 
+    scrollTop(scrollTop: number) {
+        let scrollableHeight = this.contentViewChild.nativeElement.scrollHeight - this.contentViewChild.nativeElement.clientHeight;
+        scrollTop = scrollTop > scrollableHeight ? scrollableHeight : scrollTop > 0 ? scrollTop : 0;
+        this.contentViewChild.nativeElement.scrollTop = scrollTop;
+    }
+
     onDocumentMouseUp(e: Event) {
-        this.domHandler.removeClass(this.yBarViewChild.nativeElement, 'ui-scrollpanel-grabbed');
-        this.domHandler.removeClass(this.xBarViewChild.nativeElement, 'ui-scrollpanel-grabbed');
-        this.domHandler.removeClass(document.body, 'ui-scrollpanel-grabbed');
+        DomHandler.removeClass(this.yBarViewChild.nativeElement, 'p-scrollpanel-grabbed');
+        DomHandler.removeClass(this.xBarViewChild.nativeElement, 'p-scrollpanel-grabbed');
+        DomHandler.removeClass(document.body, 'p-scrollpanel-grabbed');
 
         document.removeEventListener('mousemove', this.onDocumentMouseMove);
         document.removeEventListener('mouseup', this.onDocumentMouseUp);

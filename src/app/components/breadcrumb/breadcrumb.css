@@ -1,20 +1,16 @@
-/** Breadcrumb **/
-.ui-breadcrumb {
+.p-breadcrumb ul {
     margin: 0;
     padding: 0;
-    padding: .3em;
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.ui-breadcrumb ul {
-    margin: 0;
-    padding: 0;
+.p-breadcrumb .p-menuitem-text {
+    line-height: 1;
 }
 
-.ui-breadcrumb ul li {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.ui-breadcrumb ul li .ui-menuitem-link {
+.p-breadcrumb .p-menuitem-link {
     text-decoration: none;
 }

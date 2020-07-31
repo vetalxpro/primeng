@@ -1,4 +1,4 @@
-import {NgModule,Component,ElementRef,OnInit,Input,Output,EventEmitter,forwardRef,ChangeDetectorRef} from '@angular/core';
+import {NgModule,Component,OnInit,Input,Output,EventEmitter,forwardRef,ChangeDetectorRef,ChangeDetectionStrategy, ViewEncapsulation} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from '@angular/forms';
 
@@ -11,21 +11,19 @@ export const RATING_VALUE_ACCESSOR: any = {
 @Component({
     selector: 'p-rating',
     template: `
-        <div class="ui-rating" [ngClass]="{'ui-state-disabled': disabled}">
-            <a href="#" *ngIf="cancel" (click)="clear($event)">
-                <span class="fa" [ngClass]="iconCancelClass" [ngStyle]="iconCancelStyle"></span>
-            </a>
-            <a href="#" *ngFor="let star of starsArray;let i=index" (click)="rate($event,i)">
-                <span class="fa" 
-                    [ngClass]="(!value || i >= value) ? iconOffClass : iconOnClass"
-                    [ngStyle]="(!value || i >= value) ? iconOffStyle : iconOnStyle"
-                ></span>
-            </a>
+        <div class="p-rating" [ngClass]="{'p-readonly': readonly, 'p-disabled': disabled}">
+            <span [attr.tabindex]="(disabled || readonly) ? null : '0'" *ngIf="cancel" (click)="clear($event)" (keydown.enter)="clear($event)" class="p-rating-icon p-rating-cancel" [ngClass]="iconCancelClass" [ngStyle]="iconCancelStyle"></span>
+            <span *ngFor="let star of starsArray;let i=index" class="p-rating-icon" [attr.tabindex]="(disabled || readonly) ? null : '0'"  (click)="rate($event,i)" (keydown.enter)="rate($event,i)"
+                [ngClass]="(!value || i >= value) ? iconOffClass : iconOnClass"
+                [ngStyle]="(!value || i >= value) ? iconOffStyle : iconOnStyle"></span>
         </div>
     `,
-    providers: [RATING_VALUE_ACCESSOR]
+    providers: [RATING_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./rating.css']
 })
-export class Rating implements ControlValueAccessor {
+export class Rating implements OnInit,ControlValueAccessor {
 
     @Input() disabled: boolean;
 
@@ -35,15 +33,15 @@ export class Rating implements ControlValueAccessor {
 
     @Input() cancel: boolean = true;
 
-    @Input() iconOnClass: string = 'fa-star';
+    @Input() iconOnClass: string = 'pi pi-star';
 
     @Input() iconOnStyle: any;
 
-    @Input() iconOffClass: string = 'fa-star-o';
+    @Input() iconOffClass: string = 'pi pi-star-o';
 
     @Input() iconOffStyle: any;
 
-    @Input() iconCancelClass: string = 'fa-ban';
+    @Input() iconCancelClass: string = 'pi pi-ban';
 
     @Input() iconCancelStyle: any;
 
@@ -69,7 +67,7 @@ export class Rating implements ControlValueAccessor {
     }
     
     rate(event, i: number): void {
-        if(!this.readonly&&!this.disabled) {
+        if (!this.readonly&&!this.disabled) {
             this.value = (i + 1);
             this.onModelChange(this.value);
             this.onModelTouched();
@@ -82,7 +80,7 @@ export class Rating implements ControlValueAccessor {
     }
     
     clear(event): void {
-        if(!this.readonly&&!this.disabled) {
+        if (!this.readonly&&!this.disabled) {
             this.value = null;
             this.onModelChange(this.value);
             this.onModelTouched();

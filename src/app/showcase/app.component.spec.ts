@@ -1,12 +1,25 @@
 import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { FormsModule } from '@angular/forms';
+import { AutoCompleteModule } from '../components/autocomplete/autocomplete';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AppConfigComponent } from './app.config.component';
+import { VersionService } from './service/versionservice';
+import { HttpClientModule } from '@angular/common/http';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-        imports: [ RouterTestingModule ],
-        declarations: [ AppComponent ]
+        imports: [ 
+          RouterTestingModule,
+          FormsModule,
+          BrowserAnimationsModule,
+          AutoCompleteModule,
+          HttpClientModule
+        ],
+        declarations: [ AppComponent, AppConfigComponent ],
+        providers: [VersionService]
     }).compileComponents();
   }));
 

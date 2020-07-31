@@ -1,14 +1,15 @@
-import {NgModule}     from '@angular/core';
+import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormsModule}    from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {InputGroupDemo} from './inputgroupdemo';
 import {InputGroupDemoRoutingModule} from './inputgroupdemo-routing.module';
-import {InputTextModule} from '../../../components/inputtext/inputtext';
-import {CheckboxModule} from '../../../components/checkbox/checkbox';
-import {RadioButtonModule} from '../../../components/radiobutton/radiobutton';
-import {ButtonModule} from '../../../components/button/button';
-import {TabViewModule} from '../../../components/tabview/tabview';
-import {CodeHighlighterModule} from '../../../components/codehighlighter/codehighlighter';
+import {InputTextModule} from 'primeng/inputtext';
+import {CheckboxModule} from 'primeng/checkbox';
+import {RadioButtonModule} from 'primeng/radiobutton';
+import {ButtonModule} from 'primeng/button';
+import {TabViewModule} from 'primeng/tabview';
+import {AppInputStyleSwitchModule} from '../../app.inputstyleswitch.component';
+import {AppCodeModule} from '../../app.code.component';
 
 @NgModule({
 	imports: [
@@ -20,7 +21,8 @@ import {CodeHighlighterModule} from '../../../components/codehighlighter/codehig
         CheckboxModule,
         RadioButtonModule,
         TabViewModule,
-        CodeHighlighterModule
+        AppInputStyleSwitchModule,
+        AppCodeModule
 	],
 	declarations: [
 		InputGroupDemo

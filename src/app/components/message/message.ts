@@ -1,18 +1,27 @@
-import {NgModule,Component,Input,Output,EventEmitter,Optional} from '@angular/core';
+import {NgModule,Component,Input,ChangeDetectionStrategy, ViewEncapsulation} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 @Component({
     selector: 'p-message',
     template: `
-        <div aria-live="polite" class="ui-message ui-widget ui-corner-all" *ngIf="severity"
-        [ngClass]="{'ui-messages-info': (severity === 'info'),
-                'ui-messages-warn': (severity === 'warn'),
-                'ui-messages-error': (severity === 'error'),
-                'ui-messages-success': (severity === 'success')}">
-            <span class="ui-message-icon" [ngClass]="icon"></span>
-            <span class="ui-message-text">{{text}}</span>
+        <div aria-live="polite" class="p-inline-message p-component p-inline-message" *ngIf="severity"
+        [ngClass]="{'p-inline-message-info': (severity === 'info'),
+                'p-inline-message-warn': (severity === 'warn'),
+                'p-inline-message-error': (severity === 'error'),
+                'p-inline-message-success': (severity === 'success'),
+                'p-inline-message-icon-only': this.text == null}">
+            <span class="p-inline-message-icon" [ngClass]="icon"></span>
+            <div *ngIf="!escape; else escapeOut">
+                <span *ngIf="!escape" class="p-inline-message-text" [innerHTML]="text"></span>
+            </div>
+            <ng-template #escapeOut>
+                <span *ngIf="escape" class="p-inline-message-text">{{text}}</span>
+            </ng-template>
         </div>
-    `
+    `,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./message.css']
 })
 export class UIMessage {
 
@@ -20,29 +29,31 @@ export class UIMessage {
 
     @Input() text: string;
 
+    @Input() escape: boolean = true;
+
     get icon(): string {
         let icon: string = null;
 
-        if(this.severity) {
+        if (this.severity) {
             switch(this.severity) {
                 case 'success':
-                    icon = 'fa fa-check';
+                    icon = 'pi pi-check';
                 break;
 
                 case 'info':
-                    icon = 'fa fa-info-circle';
+                    icon = 'pi pi-info-circle';
                 break;
 
                 case 'error':
-                    icon = 'fa fa-close';
+                    icon = 'pi pi-times-circle';
                 break;
 
                 case 'warn':
-                    icon = 'fa fa-warning';
+                    icon = 'pi pi-exclamation-triangle';
                 break;
 
                 default:
-                    icon = 'fa fa-info-circle';
+                    icon = 'pi pi-info-circle';
                 break;
             }
         }

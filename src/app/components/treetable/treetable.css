@@ -1,134 +1,189 @@
-.ui-treetable {
+.p-treetable {
     position: relative;
 }
 
-.ui-treetable table {
-	border-collapse:collapse;
+.p-treetable table {
+    border-collapse: collapse;
     width: 100%;
     table-layout: fixed;
 }
 
-.ui-treetable .ui-treetable-header,
-.ui-treetable .ui-treetable-footer {
-    text-align:center;
-	padding: .5em .75em;
+.p-treetable .p-sortable-column {
+    cursor: pointer;
+    user-select: none;
 }
 
-.ui-treetable .ui-treetable-header {
-    border-bottom: 0 none;
+.p-treetable .p-sortable-column .p-column-title,
+.p-treetable .p-sortable-column .p-sortable-column-icon,
+.p-treetable .p-sortable-column .p-sortable-column-badge {
+    vertical-align: middle;
 }
 
-.ui-treetable .ui-treetable-footer {
+.p-treetable .p-sortable-column .p-sortable-column-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.p-treetable-auto-layout > .p-treetable-wrapper {
+    overflow-x: auto;
+}
+
+.p-treetable-auto-layout > .p-treetable-wrapper > table {
+    table-layout: auto;
+}
+
+.p-treetable-hoverable-rows .p-treetable-tbody > tr {
+    cursor: pointer;
+}
+
+.p-treetable-toggler {
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    overflow: hidden;
+    position: relative;
+}
+
+p-treetabletoggler + p-treetablecheckbox .p-checkbox {
+    vertical-align: middle;
+}
+
+p-treetabletoggler + p-treetablecheckbox + span {
+    vertical-align: middle;
+}
+
+/* Scrollable */
+.p-treetable-scrollable-wrapper {
+    position: relative;
+}
+
+.p-treetable-scrollable-header,
+.p-treetable-scrollable-footer {
+    overflow: hidden;
+}
+
+.p-treetable-scrollable-body {
+    overflow: auto;
+    position: relative;
+}
+
+.p-treetable-scrollable-body > table > .p-treetable-tbody > tr:first-child > td {
     border-top: 0 none;
 }
 
-.ui-treetable th, .ui-treetable tfoot td {
-    text-align: center;
+.p-treetable-virtual-table {
+    position: absolute;
 }
 
-.ui-treetable thead th,
-.ui-treetable tbody td,
-.ui-treetable tfoot td {
-    padding: .25em .5em;
+/* Frozen Columns */
+.p-treetable-frozen-view .p-treetable-scrollable-body {
     overflow: hidden;
-    white-space: nowrap;
-    border-width: 1px;
-    border-style: solid;
 }
 
-.ui-treetable tbody td {
-    border-color: inherit;
+.p-treetable-frozen-view > .p-treetable-scrollable-body > table > .p-treetable-tbody > tr > td:last-child {
+    border-right: 0 none;
 }
 
-.ui-treetable tbody td:first-child span {
-    vertical-align: middle;
+.p-treetable-unfrozen-view {
+    position: absolute;
+    top: 0;
 }
 
-.ui-treetable .ui-treetable-toggler {
-    vertical-align: middle;
-    cursor: pointer;
-    text-decoration: none;
+/* Flex Scrollable */
+.p-treetable-flex-scrollable {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
 }
 
-.ui-treetable .ui-treetable-checkbox {
-    margin-right: .5em;
+.p-treetable-flex-scrollable .p-treetable-scrollable-wrapper,
+.p-treetable-flex-scrollable .p-treetable-scrollable-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
 }
 
-.ui-treetable .ui-treetable-checkbox .ui-chkbox-icon {
-    margin-left: 1px;
-}
-
-.ui-treetable .ui-treetable-row.ui-treetable-row-selectable {
-    cursor: pointer;
-}
-
-.ui-treetable .ui-treetable-row.ui-state-highlight {
-    border: 0 none;
-}
-      
-.ui-treetable tr.ui-state-hover {
-    border-color: inherit;
-    font-weight: inherit;
-}
-
-.ui-treetable .ui-treetable-indent {
-    width: 1em;
-    height: 1em;
-    float: left;
+.p-treetable-flex-scrollable .p-treetable-scrollable-body {
+    flex: 1;
 }
 
 /* Resizable */
-.ui-treetable .ui-column-resizer {
+.p-treetable-resizable > .p-treetable-wrapper {
+    overflow-x: auto;
+}
+
+.p-treetable-resizable .p-treetable-thead > tr > th,
+.p-treetable-resizable .p-treetable-tfoot > tr > td,
+.p-treetable-resizable .p-treetable-tbody > tr > td {
+    overflow: hidden;
+}
+
+.p-treetable-resizable .p-resizable-column {
+    background-clip: padding-box;
+    position: relative;
+}
+
+.p-treetable-resizable-fit .p-resizable-column:last-child .p-column-resizer {
+    display: none;
+}
+
+.p-treetable .p-column-resizer {
     display: block;
     position: absolute !important;
     top: 0;
     right: 0;
     margin: 0;
-    width: .5em;
+    width: .5rem;
     height: 100%;
     padding: 0px;
     cursor:col-resize;
     border: 1px solid transparent;
 }
 
-.ui-treetable .ui-column-resizer-helper {
+.p-treetable .p-column-resizer-helper {
     width: 1px;
     position: absolute;
     z-index: 10;
     display: none;
 }
 
-.ui-treetable-resizable {
-    padding-bottom: 1px;     /*fix for webkit overlow*/
-    overflow:auto;
-}
-
-.ui-treetable-resizable thead th,
-.ui-treetable-resizable tbody td,
-.ui-treetable-resizable tfoot td {
-    white-space: nowrap;
-}
-
-.ui-treetable-resizable th.ui-resizable-column {
-    background-clip: padding-box;
+.p-treetable .p-row-editor-init,
+.p-treetable .p-row-editor-save,
+.p-treetable .p-row-editor-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
     position: relative;
 }
 
-/* PrimeNG */
-.ui-treetable td.ui-treetable-child-table-container {
-    padding: 0;
-    border: 0 none;
+/* Expand */
+.p-treetable .p-row-toggler {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
 }
 
-.ui-treetable .ui-treetable-row {
-    display: table-row;
-    border-bottom: 0 transparent
+/* Reorder */
+.p-treetable-reorder-indicator-up,
+.p-treetable-reorder-indicator-down {
+    position: absolute;
+    display: none;
 }
 
-.ui-treetable tbody .ui-treetable-row td {
-    border: 0 none;
-}
-
-.ui-treetable tbody .ui-treetable-row td input {
-    outline: 0 none;
+/* Loader */
+.p-treetable .p-treetable-loading-overlay {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
 }
